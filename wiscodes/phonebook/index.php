@@ -1,12 +1,10 @@
 <?php
+    session_start();
     include 'db.php';
 
     $sql = "SELECT * FROM contacts";
     $result = $conn->query($sql);
-
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,28 +13,37 @@
     <title>Phonebook</title>
 </head>
 <body>
-    <h2>Phonebook</h2>
 
-    <table border ="1">
+    <?php
+        if (isset($_SESSION['message'])) {
+            echo "<p style='color: green;'>" . $_SESSION['message'] . "</p>";
+            unset($_SESSION['message']); 
+        }
+    ?>
+
+    <h2>Phonebook Contacts</h2>
+    <table border="1">
         <tr>
             <th>Name</th>
             <th>Phone</th>
-            <th>Action</th>
+            <th colspan="2">Action</th> 
         </tr>
         <?php
-            if ($result->num_rows > 0){
-                while ($row = $result->fetch_assoc()){
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row['name'] . "</td>";
-                    echo "<td>" . $row['phone'] . "</td>";
-                    echo "<td> <a href='delete.php?id=" . $row['id'] . ">Delete</a> </td>";
+                    echo "<td>" . htmlspecialchars($row['name']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
+                    echo "<td><a href='delete.php?id=" . urlencode($row['id']) . "'>Delete</a></td>";
+                    echo "<td><a href='edit.php?id=" . urlencode($row['id']) . "'>Edit</a></td>";
                     echo "</tr>";
                 }
-            }else{
-                echo "<tr><td colspan='3'>No Contacts found</td></tr>";
+            } else {
+                echo "<tr><td colspan='4'>No Contacts</td></tr>";
             }
-
         ?>
     </table>
+    <br>
+    <a href="add.php">Add New Contact</a>
 </body>
 </html>
